@@ -5,6 +5,8 @@ import MaterialCommunityIcons from '@expo/vector-icons/MaterialCommunityIcons'
 
 import { data } from "@/data/todos";
 
+import Animated, { LinearTransition } from 'react-native-reanimated'
+
 export default function Index() {
   const [todos, setTodos] = useState(data.sort((a, b) => b.id - a.id))
   const [text, setText] = useState('')
@@ -29,7 +31,7 @@ export default function Index() {
 
   const renderItem = ({ item }) => (
     <View className="flex-row items-center justify-between gap-4 p-2 border-b-gray-500 border-b-2 w-full max-w-[1024] mx-auto pointer-events-auto" >
-      <Text className={item.completed ? `flex-1 text-sm text-white line-through` : `flex-1 text-sm text-white`} onPress={() => toggleTodo(item.id)}
+      <Text className={item.completed ? `flex-1 text-sm text-white line-through` : `font-interMedium flex-1 text-sm text-white`} onPress={() => toggleTodo(item.id)}
       >
         {item.title}
       </Text>
@@ -42,12 +44,12 @@ export default function Index() {
   return (
     <SafeAreaView className="flex-1 bg-black">
       <View className="flex-row p-2 items-center w-full max-w-[1024]">
-        <TextInput className="flex-1 border-2 border-white rounded-md p-4 mr-1 font-[18] min-w-0 text-white" placeholder="Add a new todo" placeholderTextColor="gray" value={text} onChangeText={setText} />
+        <TextInput className="font-interMedium flex-1 border-2 border-white rounded-md p-4 mr-1 font-[18] min-w-0 text-white" placeholder="Add a new todo" placeholderTextColor="gray" value={text} onChangeText={setText} />
         <Pressable className="bg-white border-4 p-2 rounded-lg" onPress={addTodo} >
           <Text className="text-2xl text-black">Add</Text>
         </Pressable>
       </View>
-      <FlatList data={todos} renderItem={renderItem} contentContainerClassName="grow" />
+      <Animated.FlatList data={todos} renderItem={renderItem} contentContainerClassName="grow" itemLayoutAnimation={LinearTransition} keyboardDismissMode='on-drag' />
     </SafeAreaView>
   );
 }
