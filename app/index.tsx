@@ -1,15 +1,48 @@
 import { Text, View, TextInput, Pressable, FlatList } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import MaterialCommunityIcons from '@expo/vector-icons/MaterialCommunityIcons'
-
-import { data } from "@/data/todos";
-
+import AsyncStorage from "@react-native-async-storage/async-storage"
 import Animated, { LinearTransition } from 'react-native-reanimated'
+import { data } from "@/data/todos";
+import { StatusBar } from "expo-status-bar";
 
 export default function Index() {
-  const [todos, setTodos] = useState(data.sort((a, b) => b.id - a.id))
+  const [todos, setTodos] = useState([])
   const [text, setText] = useState('')
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const jsonValue = await AsyncStorage.getItem("TodoApp")
+        const storageTodos = jsonValue != null ? JSON.parse(jsonValue) : null
+
+        if (storageTodos && storageTodos.length) {
+          setTodos(storageTodos.sort((a, b) => b.id - a.id))
+        } else {
+          setTodos(data.sort((a, b) => b.id - a.id))
+        }
+      } catch (e) {
+        console.log(e);
+
+      }
+    }
+
+    fetchData()
+  }, [])
+
+  useEffect(() => {
+    const storeData = async () => {
+      try {
+        const jsonValue = JSON.stringify(todos)
+        await AsyncStorage.setItem("TodoApp", jsonValue)
+      } catch (e) {
+        console.log(e);
+      }
+    }
+
+    storeData()
+  }, [todos])
 
   const addTodo = () => {
     if (text.trim()) {
@@ -50,6 +83,7 @@ export default function Index() {
         </Pressable>
       </View>
       <Animated.FlatList data={todos} renderItem={renderItem} contentContainerClassName="grow" itemLayoutAnimation={LinearTransition} keyboardDismissMode='on-drag' />
+      <StatusBar />
     </SafeAreaView>
   );
 }
