@@ -6,10 +6,12 @@ import AsyncStorage from "@react-native-async-storage/async-storage"
 import Animated, { LinearTransition } from 'react-native-reanimated'
 import { data } from "@/data/todos";
 import { StatusBar } from "expo-status-bar";
+import { useRouter } from "expo-router";
 
 export default function Index() {
   const [todos, setTodos] = useState([])
   const [text, setText] = useState('')
+  const router = useRouter()
 
   useEffect(() => {
     const fetchData = async () => {
@@ -62,12 +64,21 @@ export default function Index() {
     setTodos(todos.filter(todo => todo.id !== id))
   }
 
+  const handlePress = (id: number) => {
+    router.push(`/todos/${id}`)
+  }
+
   const renderItem = ({ item }) => (
     <View className="flex-row items-center justify-between gap-4 p-2 border-b-gray-500 border-b-2 w-full max-w-[1024] mx-auto pointer-events-auto" >
-      <Text className={item.completed ? `flex-1 text-sm text-white line-through` : `font-interMedium flex-1 text-sm text-white`} onPress={() => toggleTodo(item.id)}
+      <Pressable
+        onPress={() => handlePress(item.id)}
+        onLongPress={() => toggleTodo(item.id)}
       >
-        {item.title}
-      </Text>
+        <Text className={item.completed ? `flex-1 text-sm text-white line-through` : `font-interMedium flex-1 text-sm text-white`}
+        >
+          {item.title}
+        </Text>
+      </Pressable>
       <Pressable onPress={() => removeTodo(item.id)}>
         <MaterialCommunityIcons name="delete-circle" size={36} color="red" selectable={undefined} />
       </Pressable>
@@ -77,7 +88,7 @@ export default function Index() {
   return (
     <SafeAreaView className="flex-1 bg-black">
       <View className="flex-row p-2 items-center w-full max-w-[1024]">
-        <TextInput className="font-interMedium flex-1 border-2 border-white rounded-md p-4 mr-1 font-[18] min-w-0 text-white" placeholder="Add a new todo" placeholderTextColor="gray" value={text} onChangeText={setText} />
+        <TextInput className="font-interMedium flex-1 border-2 border-white rounded-md p-4 mr-1 font-[18] min-w-0 text-white" placeholder="Add a new todo" maxLength={30} placeholderTextColor="gray" value={text} onChangeText={setText} />
         <Pressable className="bg-white border-4 p-2 rounded-lg" onPress={addTodo} >
           <Text className="text-2xl text-black">Add</Text>
         </Pressable>
